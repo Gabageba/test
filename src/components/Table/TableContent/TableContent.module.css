@@ -1,0 +1,18 @@
+.content {
+
+}
+
+.id {
+    text-align: center;
+}
+
+
+.tableContent td {
+    font-family: 'Roboto', serif;
+    font-weight: 500;
+    font-size: 13px;
+    padding: 14px 12px 14px 11px;
+    border: 1px solid #E3E6EC;
+    box-sizing: border-box;
+
+}

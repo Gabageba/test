@@ -1,0 +1,40 @@
+.pages {
+    width: 100%;
+    position: relative;
+    margin-top: 20px;
+}
+
+.pages div {
+    position: absolute;
+    font-family: 'Roboto', serif;
+    font-weight: 500;
+    font-size: 24px;
+    color: #474955;
+    cursor: pointer;
+}
+
+.prevButton {
+    top: 0;
+    left: 119px;
+}
+
+.nextButton {
+    top: 0;
+    right: 103px;
+}
+
+.buttons {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translate(-50%, -50%)
+}
+
+.pageButton {
+    font-family: 'Roboto', serif;
+    font-style: italic;
+    font-weight: 700;
+    font-size: 18px;
+    border: none;
+    cursor: pointer;
+}

@@ -1,0 +1,31 @@
+.search {
+    height: 52px;
+    width: 535px;
+    border-radius: 0;
+    background: #5A5C66;
+    border: none;
+    outline: none;
+    padding-left: 26px;
+    padding-right: 69px;
+    color: #B2B7BF;
+    font-family: 'Roboto', serif;
+    font-style: normal;
+    font-weight: 400;
+    font-size: 14px;
+}
+
+.searchForm {
+    width: 631px;
+    position: relative;
+}
+
+::placeholder {
+    color: #B2B7BF;
+    opacity: 1;
+}
+
+.searchLogo {
+    position: absolute;
+    right: 24px;
+    top: 15px;
+}
