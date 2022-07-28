@@ -1,64 +1,58 @@
-import React, {useEffect, useState} from 'react'
+import React, {useState} from 'react'
 import style from './Table.module.css'
 import arrowUp from '../../assets/arrowUp.png'
 import arrowDown from '../../assets/arrowDown.png'
-import {usePosts} from '../../hooks/posts'
 import TableContent from './TableContent/TableContent'
-import Pages from '../Pages/Pages'
-import Loader from '../Loader'
-import Error from '../Error'
+import {useSelector} from 'react-redux'
+import {usePosts} from '../../hooks/posts'
 
 const Table = () => {
-  const {
-    visiblePost,
-    currentPage,
-    totalCount,
-    setCurrentPage,
-    loading,
-    error,
-    idFilter,
-    descriptionFilter,
-    titleFilter
-  } = usePosts()
+
+  const {idSort, bodySort, titleSort} = usePosts()
+  const visiblePost = useSelector((state: IState) => state.posts.visiblePosts)
   const [idReverse, setIdReverse] = useState(true)
   const [titleReverse, setTitleReverse] = useState(true)
   const [descriptionReverse, setDescriptionReverse] = useState(true)
 
-  useEffect(() => {
-    console.log('dfs')}, [])
 
   return (
     <>
       <table className={style.table}>
+        <thead>
         <tr style={{height: '54px', border: '1px solid #474955'}}>
           <th className={style.header} style={{width: '110px'}} onClick={() => {
-            idFilter(idReverse)
+            idSort(idReverse)
             setIdReverse(!idReverse)
+            setTitleReverse(true)
+            setDescriptionReverse(true)
           }}>
             <span style={{marginRight: '39px'}}>ID</span>
             <img src={idReverse ? arrowUp : arrowDown} className={style.arrow} alt="arrow"/>
           </th>
           <th className={style.header} style={{width: '529px'}} onClick={() => {
-            titleFilter(titleReverse)
+            titleSort(titleReverse)
             setTitleReverse(!titleReverse)
+            setIdReverse(true)
+            setDescriptionReverse(true)
           }}>
             <span style={{marginRight: '39px'}}>Заголовок</span>
-            <img src={idReverse ? arrowUp : arrowDown} className={style.arrow} alt="arrow"/>
+            <img src={titleReverse ? arrowUp : arrowDown} className={style.arrow} alt="arrow"/>
           </th>
           <th className={style.header} onClick={() => {
-            descriptionFilter(descriptionReverse)
+            bodySort(descriptionReverse)
             setDescriptionReverse(!descriptionReverse)
+            setIdReverse(true)
+            setTitleReverse(true)
           }}>
             <span style={{marginRight: '39px'}}>Описание</span>
-            <img src={idReverse ? arrowUp : arrowDown} className={style.arrow} alt="arrow"/>
+            <img src={descriptionReverse ? arrowUp : arrowDown} className={style.arrow} alt="arrow"/>
           </th>
         </tr>
-        {visiblePost.map(visiblePost => <TableContent posts={visiblePost}/>)}
+        </thead>
+        <tbody>
+        {visiblePost && visiblePost.map(post => <TableContent posts={post} key={post.id}/>)}
+        </tbody>
       </table>
-      {loading && <Loader/>}
-      {error && <Error error={error}/>}
-      <Pages limit={10} currentPage={currentPage} totalCount={totalCount} setPage={(page) => setCurrentPage(page)}/>
-
     </>
 
   )

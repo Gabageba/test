@@ -1,6 +1,5 @@
-import React from 'react';
+import React from 'react'
 import style from './Pages.module.css'
-import {IPost} from '../../models'
 import {useNavigate} from 'react-router-dom'
 
 interface PagesProps {
@@ -11,23 +10,28 @@ interface PagesProps {
 }
 
 
-const Pages = ({limit, currentPage, totalCount, setPage} : PagesProps) => {
+const Pages = ({limit, currentPage, totalCount, setPage}: PagesProps) => {
   const pageCount = Math.ceil(totalCount / limit)
   const pages = []
   const navigate = useNavigate()
   for (let i = 0; i < pageCount; i++) {
     pages.push(i + 1)
   }
-
   return (
     <div className={style.pages}>
-      {currentPage > 1 &&
-        <div className={style.prevButton} onClick={() => setPage(currentPage - 1)}>Назад</div>
-      }
-      <span className={style.buttons}>
+      {pageCount > 1 &&
+        <>
+          {currentPage > 1 &&
+            <div className={style.prevButton} onClick={() => {
+              setPage(currentPage - 1)
+              navigate(`/${currentPage - 1}`)
+            }}>Назад</div>
+          }
+          <span className={style.buttons}>
          {pages.map(page => {
            return (
-             <button className={style.pageButton} style={{color: page === currentPage ? '#7EBC3C' : '#474955'}} onClick={() => {
+             <button className={style.pageButton} style={{color: page === currentPage ? '#7EBC3C' : '#474955'}}
+                     key={page} onClick={() => {
                setPage(page)
                navigate(`/${page}`)
              }}>
@@ -36,11 +40,16 @@ const Pages = ({limit, currentPage, totalCount, setPage} : PagesProps) => {
            )
          })}
       </span>
-      {currentPage < pageCount &&
-        <div className={style.nextButton} onClick={() => setPage(currentPage + 1)}>Вперед</div>
+          {currentPage < pageCount &&
+            <div className={style.nextButton} onClick={() => {
+              setPage(currentPage + 1)
+              navigate(`/${currentPage + 1}`)
+            }}>Вперед</div>
+          }
+        </>
       }
     </div>
-  );
-};
+  )
+}
 
-export default Pages;
+export default Pages

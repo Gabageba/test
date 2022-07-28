@@ -1,29 +1,43 @@
-import axios, {AxiosError} from 'axios'
-import {useEffect, useState} from 'react'
-import {IPost} from '../models'
-
+import {useDispatch, useSelector} from 'react-redux'
+import {addPosts, addVisiblePosts, setAllPosts, setPage, setTotalCount} from '../redux/actionCreators'
+import {useEffect} from 'react'
+import {useNavigate} from 'react-router-dom'
 
 export const usePosts = () => {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [posts, setPosts] = useState<IPost[]>([])
-  const [allPosts, setAllPosts] = useState<IPost[]>([])
-  const [currentPage, setCurrentPage] = useState(1)
-  const [totalCount, setTotalCount] = useState(0)
-  const [visiblePost, setVisiblePost] = useState<IPost[]>([])
+  const posts = useSelector((state: IState) => state.posts.posts)
+  const allPosts = useSelector((state: IState) => state.posts.allPosts)
+  const currentPage = useSelector((state: IState) => state.page.page)
+  const dispatch = useDispatch()
+  const params = window.location.pathname
+  const navigate = useNavigate()
 
-  const idFilter = (isReverse: boolean) => {
-    isReverse ?
-      setPosts(posts.sort((a, b) => {
-        return a.id - b.id
-      }).reverse())
-      :
-      setPosts(posts.sort((a, b) => {
-        return a.id - b.id
-      }))
-    setCurrentPage(1)
-    setVisiblePost(posts.slice(0, 10))
+  useEffect(() => {
+    setVisiblePost(posts)
+  }, [currentPage])
+
+  const setVisiblePost = (post: IPost[]) => {
+    dispatch(addVisiblePosts(post.slice(currentPage * 10 - 10, currentPage * 10)))
   }
+
+  const idSort = (isReverse: boolean) => {
+    isReverse ?
+      dispatch(addPosts(posts.sort((a, b) => {
+        return a.id - b.id
+      }).reverse()))
+      :
+      dispatch(addPosts(posts.sort((a, b) => {
+        return a.id - b.id
+      })))
+
+    dispatch(setPage(1))
+    navigate('/1')
+    setVisiblePost(posts)
+  }
+
+  useEffect(() => {
+    const num = parseInt(params.split('/')[1])
+    num && dispatch(setPage(num))
+  }, [params])
 
   const abcTitleSort = (a: IPost, b: IPost) => {
     if (a.title > b.title) {
@@ -35,24 +49,6 @@ export const usePosts = () => {
     return 0;
   }
 
-  const search = (str: string) => {
-    let searchPost: any[] = []
-    allPosts.map(post => {
-      if (post.id.toString().indexOf(str) != -1 || post.body.indexOf(str) != -1 || post.title.indexOf(str) != -1) {
-        searchPost = [...searchPost, post]
-      }
-    })
-    return searchPost
-  }
-
-  const searchClick = (str: string) => {
-    setCurrentPage(1)
-    setPosts(search(str))
-    setVisiblePost(search(str))
-  }
-
-
-
   const abcDescSort = (a: IPost, b: IPost) => {
     if (a.body > b.body) {
       return 1;
@@ -63,52 +59,49 @@ export const usePosts = () => {
     return 0;
   }
 
-  const titleFilter = (isReverse: boolean) => {
+  const titleSort = (isReverse: boolean) => {
     isReverse ?
-      setPosts(posts.sort(abcTitleSort).reverse())
+      dispatch(addPosts(posts.sort(abcTitleSort).reverse()))
       :
-      setPosts(posts.sort(abcTitleSort))
-    setCurrentPage(1)
-    setVisiblePost(posts.slice(0, 10))
+      dispatch(addPosts(posts.sort(abcTitleSort)))
+    dispatch(setPage(1))
+    navigate('/1')
+    dispatch(setAllPosts(posts))
+    setVisiblePost(posts)
   }
 
-  const descriptionFilter = (isReverse: boolean) => {
+  const bodySort = (isReverse: boolean) => {
     isReverse ?
-      setPosts(posts.sort(abcDescSort).reverse())
+      dispatch(addPosts(posts.sort(abcDescSort).reverse()))
       :
-      setPosts(posts.sort(abcDescSort))
-    setCurrentPage(1)
-    setVisiblePost(posts.slice(0, 10))
-    setTotalCount(posts.length)
+      dispatch(addPosts(posts.sort(abcDescSort)))
+    dispatch(setPage(1))
+    navigate('/1')
+    dispatch(setAllPosts(posts))
+    setVisiblePost(posts)
   }
 
-  async function fetchPosts() {
-    try {
-      setError('')
-      setLoading(true)
-      setVisiblePost([])
-      const response = await axios.get<IPost[]>('https://jsonplaceholder.typicode.com/posts')
-      setAllPosts(response.data)
-      setPosts(response.data)
-      setTotalCount(response.data.length)
-      setVisiblePost(response.data.slice(currentPage * 10 - 10, currentPage * 10))
-      setLoading(false)
-    } catch (e: unknown) {
-      const error = e as AxiosError
-      setLoading(false)
-      setError(error.message)
+  const search = (str: string) => {
+    if (str === '') {
+      dispatch(setTotalCount(allPosts.length))
+      dispatch(addPosts(allPosts))
+      dispatch(setPage(1))
+      navigate('/1')
+      setVisiblePost(allPosts)
+    } else {
+      let searchPost: any[] = []
+      allPosts.map(post => {
+        if (post.id.toString().indexOf(str) != -1 || post.body.indexOf(str) != -1 || post.title.indexOf(str) != -1) {
+          searchPost = [...searchPost, post]
+        }
+      })
+      dispatch(setTotalCount(searchPost.length))
+      setVisiblePost(searchPost)
+      dispatch(setPage(1))
+      navigate('/1')
+      dispatch(addPosts(searchPost))
     }
   }
 
-  useEffect(() => {
-    setVisiblePost(posts.slice(currentPage * 10 - 10, currentPage * 10))
-  }, [currentPage, posts])
-
-
-  useEffect(() => {
-      fetchPosts()
-  }, [])
-
-
-  return {error, loading, visiblePost, currentPage, totalCount, setCurrentPage, idFilter, descriptionFilter, titleFilter, searchClick}
+  return {setVisiblePost, idSort, bodySort, titleSort, search}
 }

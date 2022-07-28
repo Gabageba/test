@@ -1,0 +1,5 @@
+export const ADD_POSTS = 'ADD_POSTS'
+export const ADD_VISIBLE_POSTS = 'ADD_VISIBLE_POSTS'
+export const SET_PAGE = 'SET_PAGE'
+export const SET_TOTAL_COUNT = 'SET_TOTAL_COUNT'
+export const SET_ALL_POSTS = 'SET_ALL_POSTS'
